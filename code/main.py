@@ -21,30 +21,38 @@ class MainMenu:
         sec_msg_rect = sec_msg_surf.get_rect(center = (450, 175))
         self.display_surface = pygame.display.get_surface()
         self.display_surface.blit(sec_msg_surf, sec_msg_rect)
-        
-
 
 class Game:
-    def __init__(self):
+    def __init__(self, menu_bg_music):
 
         #general setup
         self.game_active = False
 
-        #audio
-        self.menu_bg = pygame.mixer.Sound('../audio/Mombasa_Suite.mp3')
+        #audio 
+        self.menu_bg_music = menu_bg_music
+        self.menu_bg_music.play(loops = -1)
+        self.menu_music_playing = True
 
     def run(self):
+
         if self.game_active:
-            self.menu_bg.stop()
-        else: #in main menu
-            self.menu_bg.play()
+            self.menu_bg_music.stop()
+            self.menu_music_playing = False
+        else:
+            if self.menu_music_playing == False:
+                self.menu_bg_music.play()
+                self.menu_music_playing = True
             menu = MainMenu()
 
 if __name__ == '__main__':
 
     #pygame setup
     pygame.init()
-    game = Game()
+    #background music has a sample frequency of 44.1kHz, stereo sound
+    pygame.mixer.init(frequency = 96000, size=-16, channels=2, buffer=1024) 
+    menu_bg = pygame.mixer.Sound('../audio/Mombasa_Suite.mp3')
+    
+    game = Game(menu_bg)
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption('Unggoy Runner!')
     clock = pygame.time.Clock()
@@ -58,4 +66,4 @@ if __name__ == '__main__':
             game.run()
             pygame.display.update()
             clock.tick(60)
-        
+    
