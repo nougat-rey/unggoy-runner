@@ -14,16 +14,16 @@ class Menu:
         self.menu_bg = pygame.image.load('../graphics/background/bg_1.jpeg').convert()
         
         #menu messages
-        self.main_font = pygame.font.Font('../font/halo_outline.ttf', 100)
-        self.main_msg_surf = self.main_font.render('Halo', True, '#000000')
+        self.main_font = pygame.font.Font('../font/Halo.ttf', 125)
+        self.main_msg_surf = self.main_font.render('Halo', True, '#fbfffe')
         self.main_msg_rect = self.main_msg_surf.get_rect(center = (450, 125))
 
-        self.sec_font = pygame.font.Font('../font/verdana.ttf', 22)
-        self.sec_msg_surf = self.sec_font.render('Unggoy Runner', True, '#000000')
-        self.sec_msg_rect = self.sec_msg_surf.get_rect(center = (450, 175))
+        self.sec_font = pygame.font.Font('../font/Pixeltype.ttf', 35)
+        self.sec_msg_surf = self.sec_font.render('Unggoy Runner', True, '#253028')
+        self.sec_msg_rect = self.sec_msg_surf.get_rect(center = (450, 190))
         
         #display
-        self.display_surface.blit(self.menu_bg, self.menu_bg.get_rect(center = (450,235)))
+        self.display_surface.blit(self.menu_bg, self.menu_bg.get_rect(center = (422,235)))
         self.display_surface.blit(self.main_msg_surf, self.main_msg_rect)
         self.display_surface.blit(self.sec_msg_surf, self.sec_msg_rect)
         
@@ -50,7 +50,7 @@ class Level:
         self.menu_bg = pygame.image.load('../graphics/background/bg_2.jpeg').convert_alpha()
 
         #display
-        self.display_surface.blit(self.menu_bg, self.menu_bg.get_rect(center = (450,235)))
+        self.display_surface.blit(self.menu_bg, self.menu_bg.get_rect(center = (450,215)))
 
         #create menu from level
         self.create_menu = create_menu
