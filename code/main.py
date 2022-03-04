@@ -25,7 +25,7 @@ class Player(pygame.sprite.Sprite):
     def player_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and self.rect.bottom >= GROUND:
-            self.gravity = -21 #jump
+            self.gravity = -22 #jump
 
     def apply_gravity(self):
         #applies when jumping, simulates falling 
@@ -95,7 +95,7 @@ class Obstacle(pygame.sprite.Sprite):
 
     def update(self):
         self.animation_state()
-        self.rect.x -= 4
+        self.rect.x -= 9
         self.destroy()
 
 class Level:
@@ -131,7 +131,7 @@ class Level:
         self.get_input()
 
         #display
-        self.display_surface.blit(self.level_bg, self.level_bg.get_rect(midbottom = (450,HEIGHT+50)))
+        self.display_surface.blit(self.level_bg, self.level_bg.get_rect(midbottom = (450,HEIGHT-50)))
         self.display_surface.blit(self.ground, self.ground.get_rect(center = (450, 225)))
         
         self.player.update()
@@ -194,8 +194,12 @@ if __name__ == '__main__':
 
     #timers
     obstacle_timer = pygame.USEREVENT + 1
-    pygame.time.set_timer(obstacle_timer, 1500) #for spawning the flood
-    
+    pygame.time.set_timer(obstacle_timer, 1200) #for spawning the flood
+
+    #TODO: 
+    #    - Need to re-pixelate grunt and flood due to resizing
+    #    - Change color of ground to match background and move up a bit 
+
     #flood obstacles
     obstacle_group = pygame.sprite.Group()
     
