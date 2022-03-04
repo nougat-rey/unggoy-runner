@@ -1,14 +1,15 @@
 import pygame
 from settings import *
 from sys import exit
+from random import randint
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
 
         #player animation
-        player_walk_1 = self.image = pygame.image.load('../graphics/grunt/walk_1.png').convert_alpha()
-        player_walk_2 = self.image = pygame.image.load('../graphics/grunt/walk_2.png').convert_alpha()
+        player_walk_1 = GRUNT_1_IMG
+        player_walk_2 = GRUNT_2_IMG
         self.player_walk = [player_walk_1, player_walk_2]
         self.player_index = 0
 
@@ -45,14 +46,14 @@ class Menu:
         self.display_surface = pygame.display.get_surface()
 
         #background
-        self.menu_bg = pygame.image.load('../graphics/background/bg_1.jpeg').convert()
+        self.menu_bg = MENU_IMG
 
         #menu messages
-        self.main_font = pygame.font.Font('../font/Halo.ttf', 125)
+        self.main_font = MAIN_FONT
         self.main_msg_surf = self.main_font.render('Halo', True, '#fbfffe')
         self.main_msg_rect = self.main_msg_surf.get_rect(center = (450, 125))
 
-        self.sec_font = pygame.font.Font('../font/Pixeltype.ttf', 35)
+        self.sec_font = SECONDARY_FONT
         self.sec_msg_surf = self.sec_font.render('Unggoy Runner', True, '#253028')
         self.sec_msg_rect = self.sec_msg_surf.get_rect(center = (450, 190))
         
@@ -73,8 +74,30 @@ class Menu:
         self.display_surface.blit(self.main_msg_surf, self.main_msg_rect)
         self.display_surface.blit(self.sec_msg_surf, self.sec_msg_rect)
         
-        
-        
+class Obstacle(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        flood_1 = FLOOD_1_IMG
+        flood_2 = FLOOD_2_IMG
+        self.flood_frames = [flood_1, flood_2]
+        self.flood_index = 0
+        self.image = self.flood_frames[self.flood_index]
+        self.rect = self.image.get_rect(midbottom = (randint(WIDTH,WIDTH+100), GROUND))
+
+    def animation_state(self):
+        self.flood_index += 0.1
+        if self.flood_index >= len(self.flood_frames): self.flood_index = 0
+        self.image = self.flood_frames[int(self.flood_index)]
+
+    def destroy(self):
+        if self.rect.x <= -100:
+            self.kill()
+
+    def update(self):
+        self.animation_state()
+        self.rect.x -= 4
+        self.destroy()
+
 class Level:
     def __init__(self, create_menu):
         
@@ -82,8 +105,8 @@ class Level:
         self.display_surface = pygame.display.get_surface()
         
         #background
-        self.menu_bg = pygame.image.load('../graphics/background/bg_2.jpeg').convert_alpha()
-        self.ground = pygame.image.load('../graphics/ground.png').convert_alpha()
+        self.level_bg = LEVEL_IMG
+        self.ground = GROUND_IMG
         
         #create menu from level
         self.create_menu = create_menu
@@ -92,6 +115,10 @@ class Level:
         self.player = pygame.sprite.GroupSingle()
         self.player.add(Player())
 
+        #clear obstacles
+        global obstacle_group
+        obstacle_group.empty()
+
     def get_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RETURN]:
@@ -99,13 +126,18 @@ class Level:
             self.create_menu()
 
     def run(self):
+
+        global obstacle_group
         self.get_input()
-        
+
         #display
-        self.display_surface.blit(self.menu_bg, self.menu_bg.get_rect(midbottom = (450,HEIGHT+50)))
+        self.display_surface.blit(self.level_bg, self.level_bg.get_rect(midbottom = (450,HEIGHT+50)))
         self.display_surface.blit(self.ground, self.ground.get_rect(center = (450, 225)))
-        self.player.draw(self.display_surface)
+        
         self.player.update()
+        self.player.draw(self.display_surface)
+        obstacle_group.update()
+        obstacle_group.draw(self.display_surface)
 
 class Game:
     def __init__(self):
@@ -149,6 +181,24 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption('Unggoy Runner!')
     clock = pygame.time.Clock()
+
+    FLOOD_1_IMG = pygame.image.load('../graphics/flood/walk_1.png').convert_alpha()
+    FLOOD_2_IMG = pygame.image.load('../graphics/flood/walk_2.png').convert_alpha()
+    LEVEL_IMG = pygame.image.load('../graphics/background/bg_2.jpeg').convert_alpha()
+    GROUND_IMG = pygame.image.load('../graphics/ground.png').convert_alpha()
+    MENU_IMG = pygame.image.load('../graphics/background/bg_1.jpeg').convert()
+    MAIN_FONT = pygame.font.Font('../font/Halo.ttf', 125)
+    SECONDARY_FONT = pygame.font.Font('../font/Pixeltype.ttf', 35)
+    GRUNT_1_IMG = pygame.image.load('../graphics/grunt/walk_1.png').convert_alpha()
+    GRUNT_2_IMG = pygame.image.load('../graphics/grunt/walk_2.png').convert_alpha()
+
+    #timers
+    obstacle_timer = pygame.USEREVENT + 1
+    pygame.time.set_timer(obstacle_timer, 1500) #for spawning the flood
+    
+    #flood obstacles
+    obstacle_group = pygame.sprite.Group()
+    
     game = Game()        
     
     while True:
@@ -156,6 +206,9 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+            if event.type == obstacle_timer:
+                obstacle_group.add(Obstacle())
+            
 
         game.run()
         pygame.display.update()
