@@ -7,16 +7,24 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
 
         #player animation
-        #empty for now
-        
-        self.image = pygame.image.load('../graphics/grunt.png').convert_alpha()
+        player_walk_1 = self.image = pygame.image.load('../graphics/grunt/walk_1.png').convert_alpha()
+        player_walk_2 = self.image = pygame.image.load('../graphics/grunt/walk_2.png').convert_alpha()
+        self.player_walk = [player_walk_1, player_walk_2]
+        self.player_index = 0
+
+        self.image = self.player_walk[self.player_index]
         self.rect = self.image.get_rect(midbottom = (160, GROUND))
         self.gravity = 0
+
+    def animation_state(self):
+        self.player_index += 0.05
+        if self.player_index >= len(self.player_walk): self.player_index = 0
+        self.image = self.player_walk[int(self.player_index)]
 
     def player_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and self.rect.bottom >= GROUND:
-            self.gravity = -20 #jump
+            self.gravity = -21 #jump
 
     def apply_gravity(self):
         #applies when jumping, simulates falling 
@@ -28,6 +36,7 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         self.player_input()
         self.apply_gravity()
+        self.animation_state()
 
 class Menu:
     def __init__(self, create_level):
@@ -73,7 +82,7 @@ class Level:
         self.display_surface = pygame.display.get_surface()
         
         #background
-        self.menu_bg = pygame.image.load('../graphics/background/bg_2.jpeg').convert_alpha()
+        self.menu_bg = pygame.image.load('../graphics/background/bg_3.jpeg').convert_alpha()
         self.ground = pygame.image.load('../graphics/ground.png').convert_alpha()
         
         #create menu from level
@@ -93,7 +102,7 @@ class Level:
         self.get_input()
         
         #display
-        self.display_surface.blit(self.menu_bg, self.menu_bg.get_rect(center = (450,215)))
+        self.display_surface.blit(self.menu_bg, self.menu_bg.get_rect(midbottom = (450,HEIGHT+50)))
         self.display_surface.blit(self.ground, self.ground.get_rect(center = (450, 225)))
         self.player.draw(self.display_surface)
         self.player.update()
