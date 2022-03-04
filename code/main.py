@@ -119,6 +119,13 @@ class Level:
         global obstacle_group
         obstacle_group.empty()
 
+    def collision(self):
+        global obstacle_group
+        if pygame.sprite.spritecollide(self.player.sprite, obstacle_group, False):
+            obstacle_group.empty()
+            return True
+        else: return False
+
     def get_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RETURN]:
@@ -126,6 +133,9 @@ class Level:
             self.create_menu()
 
     def run(self):
+
+        if self.collision():
+            self.create_menu()
 
         global obstacle_group
         self.get_input()
