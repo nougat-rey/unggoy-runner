@@ -2,6 +2,7 @@ import pygame
 from settings import *
 from sys import exit
 from random import randint
+from support import import_audio
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -12,24 +13,29 @@ class Player(pygame.sprite.Sprite):
         player_walk_2 = GRUNT_2_IMG
         self.player_walk = [player_walk_1, player_walk_2]
         self.player_index = 0
+        self.player_jump = GRUNT_JUMP_IMG
 
         self.image = self.player_walk[self.player_index]
         self.rect = self.image.get_rect(midbottom = (160, GROUND))
         self.gravity = 0
 
     def animation_state(self):
-        self.player_index += 0.05
-        if self.player_index >= len(self.player_walk): self.player_index = 0
-        self.image = self.player_walk[int(self.player_index)]
+
+        if self.rect.bottom < GROUND:
+            self.image = self.player_jump
+        else:
+            self.player_index += 0.05
+            if self.player_index >= len(self.player_walk): self.player_index = 0
+            self.image = self.player_walk[int(self.player_index)]
 
     def player_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and self.rect.bottom >= GROUND:
-            self.gravity = -22 #jump
+            self.gravity = -20 #jump
 
     def apply_gravity(self):
         #applies when jumping, simulates falling 
-        self.gravity += 1
+        self.gravity += 0.90
         self.rect.y += self.gravity
         if self.rect.bottom >= GROUND:
             self.rect.bottom = GROUND
@@ -103,7 +109,7 @@ class Level:
         
         #screen
         self.display_surface = pygame.display.get_surface()
-        
+
         #background
         self.level_bg = LEVEL_IMG
         self.ground = GROUND_IMG
@@ -134,8 +140,8 @@ class Level:
 
     def run(self):
 
-        if self.collision():
-            self.create_menu()
+        #if self.collision():
+        #    self.create_menu()
 
         global obstacle_group
         self.get_input()
@@ -153,8 +159,8 @@ class Game:
     def __init__(self):
 
         #audio 
-        self.menu_music = pygame.mixer.Sound('../audio/Mombasa_Suite.mp3')
-        self.level_music = pygame.mixer.Sound('../audio/Peril.mp3')
+        self.menu_music = pygame.mixer.Sound('../audio/bg_music/Mombasa_Suite.mp3')
+        self.level_music = pygame.mixer.Sound('../audio/bg_music/Peril.mp3')
 
         #menu creation
         self.menu = Menu(self.create_level)
@@ -177,8 +183,10 @@ class Game:
 
         if self.status == 'menu':
             self.menu.run()
+            return False
         elif self.status == 'level':
             self.level.run()
+            return True
 
 if __name__ == '__main__':
 
@@ -192,6 +200,7 @@ if __name__ == '__main__':
     pygame.display.set_caption('Unggoy Runner!')
     clock = pygame.time.Clock()
 
+    #load assets
     FLOOD_1_IMG = pygame.image.load('../graphics/flood/walk_1.png').convert_alpha()
     FLOOD_2_IMG = pygame.image.load('../graphics/flood/walk_2.png').convert_alpha()
     LEVEL_IMG = pygame.image.load('../graphics/background/bg_2.jpg').convert_alpha()
@@ -201,29 +210,48 @@ if __name__ == '__main__':
     SECONDARY_FONT = pygame.font.Font('../font/Pixeltype.ttf', 35)
     GRUNT_1_IMG = pygame.image.load('../graphics/grunt/walk_1.png').convert_alpha()
     GRUNT_2_IMG = pygame.image.load('../graphics/grunt/walk_2.png').convert_alpha()
-
+    GRUNT_JUMP_IMG = pygame.image.load('../graphics/grunt/jump.png').convert_alpha()
+    speech_list = import_audio('../audio/sound_effects/general')
+    
     #timers
     obstacle_timer = pygame.USEREVENT + 1
     pygame.time.set_timer(obstacle_timer, 1200) #for spawning the flood
-
-    #TODO: 
-    #    - Need to re-pixelate grunt and flood due to resizing
-    #    - Change color of ground to match background and move up a bit 
+    speech_timer = pygame.USEREVENT + 2
+    pygame.time.set_timer(speech_timer, randint(4000, 6000))
 
     #flood obstacles
     obstacle_group = pygame.sprite.Group()
     
-    game = Game()        
+    game = Game()     
+    game_active = False
+    speech_index = 0
+    speech_success = False
+    speech_history = []
     
+    #add if playing...
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-            if event.type == obstacle_timer:
-                obstacle_group.add(Obstacle())
-            
+            if game_active:
+                if event.type == obstacle_timer:
+                    obstacle_group.add(Obstacle())
+                if event.type == speech_timer:
+                    while speech_success == False:
+                        if speech_index not in speech_history:
+                            speech_list[speech_index].play()
+                            speech_history.append(speech_index)
+                            speech_success = True
+                        else:
+                            speech_index = randint(0, len(speech_list)-1)    
+                    
+                    speech_success = False
+                    if len(speech_history) >= len(speech_list): #stop one short
+                        #resetting voice line, so it doesn't repeat
+                        speech_index = speech_history[0]
+                        speech_history.clear()
 
-        game.run()
+        game_active = game.run()
         pygame.display.update()
         clock.tick(60)

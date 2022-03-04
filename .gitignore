@@ -130,3 +130,5 @@ dmypy.json
 
 # psd files
 psd
+
+.DS_Store
