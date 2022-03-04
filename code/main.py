@@ -131,7 +131,7 @@ class Level:
         self.get_input()
 
         #display
-        self.display_surface.blit(self.level_bg, self.level_bg.get_rect(midbottom = (450,HEIGHT-50)))
+        self.display_surface.blit(self.level_bg, self.level_bg.get_rect(midbottom = (450,HEIGHT)))
         self.display_surface.blit(self.ground, self.ground.get_rect(center = (450, 225)))
         
         self.player.update()
@@ -184,9 +184,9 @@ if __name__ == '__main__':
 
     FLOOD_1_IMG = pygame.image.load('../graphics/flood/walk_1.png').convert_alpha()
     FLOOD_2_IMG = pygame.image.load('../graphics/flood/walk_2.png').convert_alpha()
-    LEVEL_IMG = pygame.image.load('../graphics/background/bg_2.jpeg').convert_alpha()
+    LEVEL_IMG = pygame.image.load('../graphics/background/bg_2.jpg').convert_alpha()
     GROUND_IMG = pygame.image.load('../graphics/ground.png').convert_alpha()
-    MENU_IMG = pygame.image.load('../graphics/background/bg_1.jpeg').convert()
+    MENU_IMG = pygame.image.load('../graphics/background/bg_1.jpg').convert()
     MAIN_FONT = pygame.font.Font('../font/Halo.ttf', 125)
     SECONDARY_FONT = pygame.font.Font('../font/Pixeltype.ttf', 35)
     GRUNT_1_IMG = pygame.image.load('../graphics/grunt/walk_1.png').convert_alpha()
