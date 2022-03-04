@@ -2,7 +2,32 @@ import pygame
 from settings import *
 from sys import exit
 
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
 
+        #player animation
+        #empty for now
+        
+        self.image = pygame.image.load('../graphics/grunt.png').convert_alpha()
+        self.rect = self.image.get_rect(midbottom = (160, GROUND))
+        self.gravity = 0
+
+    def player_input(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE] and self.rect.bottom >= GROUND:
+            self.gravity = -20 #jump
+
+    def apply_gravity(self):
+        #applies when jumping, simulates falling 
+        self.gravity += 1
+        self.rect.y += self.gravity
+        if self.rect.bottom >= GROUND:
+            self.rect.bottom = GROUND
+
+    def update(self):
+        self.player_input()
+        self.apply_gravity()
 
 class Menu:
     def __init__(self, create_level):
@@ -12,7 +37,7 @@ class Menu:
 
         #background
         self.menu_bg = pygame.image.load('../graphics/background/bg_1.jpeg').convert()
-        
+
         #menu messages
         self.main_font = pygame.font.Font('../font/Halo.ttf', 125)
         self.main_msg_surf = self.main_font.render('Halo', True, '#fbfffe')
@@ -22,22 +47,23 @@ class Menu:
         self.sec_msg_surf = self.sec_font.render('Unggoy Runner', True, '#253028')
         self.sec_msg_rect = self.sec_msg_surf.get_rect(center = (450, 190))
         
-        #display
-        self.display_surface.blit(self.menu_bg, self.menu_bg.get_rect(center = (422,235)))
-        self.display_surface.blit(self.main_msg_surf, self.main_msg_rect)
-        self.display_surface.blit(self.sec_msg_surf, self.sec_msg_rect)
-        
         #create level from menu
         self.create_level = create_level
 
-    def input(self):
+    def get_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
             #start level
             self.create_level()
 
     def run(self):
-        self.input()
+        self.get_input()
+
+        #display
+        self.display_surface.blit(self.menu_bg, self.menu_bg.get_rect(center = (422,235)))
+        self.display_surface.blit(self.main_msg_surf, self.main_msg_rect)
+        self.display_surface.blit(self.sec_msg_surf, self.sec_msg_rect)
+        
         
         
 class Level:
@@ -48,12 +74,14 @@ class Level:
         
         #background
         self.menu_bg = pygame.image.load('../graphics/background/bg_2.jpeg').convert_alpha()
-
-        #display
-        self.display_surface.blit(self.menu_bg, self.menu_bg.get_rect(center = (450,215)))
-
+        self.ground = pygame.image.load('../graphics/ground.png').convert_alpha()
+        
         #create menu from level
         self.create_menu = create_menu
+
+        #player
+        self.player = pygame.sprite.GroupSingle()
+        self.player.add(Player())
 
     def get_input(self):
         keys = pygame.key.get_pressed()
@@ -64,6 +92,11 @@ class Level:
     def run(self):
         self.get_input()
         
+        #display
+        self.display_surface.blit(self.menu_bg, self.menu_bg.get_rect(center = (450,215)))
+        self.display_surface.blit(self.ground, self.ground.get_rect(center = (450, 225)))
+        self.player.draw(self.display_surface)
+        self.player.update()
 
 class Game:
     def __init__(self):
