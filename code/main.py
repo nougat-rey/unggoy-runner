@@ -82,7 +82,7 @@ class Level:
         self.display_surface = pygame.display.get_surface()
         
         #background
-        self.menu_bg = pygame.image.load('../graphics/background/bg_3.jpeg').convert_alpha()
+        self.menu_bg = pygame.image.load('../graphics/background/bg_2.jpeg').convert_alpha()
         self.ground = pygame.image.load('../graphics/ground.png').convert_alpha()
         
         #create menu from level
