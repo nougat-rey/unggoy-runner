@@ -126,6 +126,8 @@ class Level:
         #clear obstacles
         global obstacle_group
         obstacle_group.empty()
+        self.hit_sound_list = collision_sound_list
+        self.hit_sound_history = []
 
     def collision(self):
         global obstacle_group
@@ -143,6 +145,7 @@ class Level:
     def run(self):
 
         if self.collision():
+            self.hit_sound_history = play_random(self.hit_sound_list, self.hit_sound_history)
             self.lives -= 1
             if self.lives <= 0:
                 self.create_menu()
@@ -203,6 +206,23 @@ class Game:
             self.level.run()
             return True
 
+def play_random(list, history):
+    index = 0
+    success = False
+
+    while success == False:
+        if index not in history:
+            list[index].play()
+            history.append(index)
+            success = True
+        else:
+            index = randint(0, len(list)-1)    
+    
+    if len(history) >= len(list):
+        history.clear()
+        history.append(index) #last played is automatically kept in history, so as to not play again
+    return history
+
 if __name__ == '__main__':
 
     #pygame setup
@@ -227,7 +247,9 @@ if __name__ == '__main__':
     GRUNT_2_IMG = pygame.image.load('../graphics/grunt/walk_2.png').convert_alpha()
     GRUNT_JUMP_IMG = pygame.image.load('../graphics/grunt/jump.png').convert_alpha()
     GRUNT_ICON_IMG = pygame.image.load('../graphics/grunt/icon.png').convert_alpha()
+    collision_sound_list = import_audio('../audio/sound_effects/collision')
     speech_list = import_audio('../audio/sound_effects/general')
+
     
     #timers
     obstacle_timer = pygame.USEREVENT + 1
@@ -240,8 +262,6 @@ if __name__ == '__main__':
     
     game = Game()     
     game_active = False
-    speech_index = 0
-    speech_success = False
     speech_history = []
     
     #add if playing...
@@ -254,19 +274,7 @@ if __name__ == '__main__':
                 if event.type == obstacle_timer:
                     obstacle_group.add(Obstacle())
                 if event.type == speech_timer:
-                    while speech_success == False:
-                        if speech_index not in speech_history:
-                            speech_list[speech_index].play()
-                            speech_history.append(speech_index)
-                            speech_success = True
-                        else:
-                            speech_index = randint(0, len(speech_list)-1)    
-                    
-                    speech_success = False
-                    if len(speech_history) >= len(speech_list): #stop one short
-                        #resetting voice line, so it doesn't repeat
-                        speech_index = speech_history[0]
-                        speech_history.clear()
+                    speech_history = play_random(speech_list, speech_history)
 
         game_active = game.run()
         pygame.display.update()
