@@ -46,7 +46,7 @@ class Player(pygame.sprite.Sprite):
         self.animation_state()
 
 class Menu:
-    def __init__(self, create_level):
+    def __init__(self, create_level, create_secret_level):
         
         #screen
         self.display_surface = pygame.display.get_surface()
@@ -65,12 +65,16 @@ class Menu:
         
         #create level from menu
         self.create_level = create_level
+        #create secret level from menu
+        self.create_secret_level = create_secret_level
 
     def get_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
             #start level
             self.create_level()
+        if keys[pygame.K_7]:
+            self.create_secret_level()
 
     def run(self):
         self.get_input()
@@ -105,7 +109,7 @@ class Obstacle(pygame.sprite.Sprite):
         self.destroy()
 
 class Level:
-    def __init__(self, create_menu):
+    def __init__(self, create_menu, create_secret_level):
         
         #screen
         self.display_surface = pygame.display.get_surface()
@@ -116,6 +120,8 @@ class Level:
         
         #create menu from level
         self.create_menu = create_menu
+        #create secret level from level
+        self.create_secret_level = create_secret_level
 
         #player
         self.player = pygame.sprite.GroupSingle()
@@ -141,6 +147,8 @@ class Level:
         if keys[pygame.K_RETURN]:
             #go back to menu
             self.create_menu()
+        if keys[pygame.K_7]:
+            self.create_secret_level()
 
     def run(self):
 
@@ -179,32 +187,45 @@ class Game:
         #audio 
         self.menu_music = pygame.mixer.Sound('../audio/bg_music/Mombasa_Suite.mp3')
         self.level_music = pygame.mixer.Sound('../audio/bg_music/Peril.mp3')
+        self.secret_level_music = pygame.mixer.Sound('../audio/bg_music/Under_Cover_of_Night.mp3')
 
         #menu creation
-        self.menu = Menu(self.create_level)
+        self.menu = Menu(self.create_level, self.create_secret_level)
         self.menu_music.play(loops = -1)
         self.status = 'menu'
 
     def create_level(self):
-        self.level = Level(self.create_menu)
+        self.level = Level(self.create_menu, self.create_secret_level)
         self.status = 'level'
         self.menu_music.stop()
+        self.secret_level_music.stop()
         self.level_music.play(loops = -1)
     
+    def create_secret_level(self):
+        self.level = Level(self.create_menu, self.create_secret_level)
+        self.level.level_bg = SECRET_LEVEL_IMG
+        self.level.ground = SECRET_GROUND_IMG
+        self.status = 'level'
+        self.menu_music.stop()
+        self.level_music.stop()
+        self.secret_level_music.play(loops = -1)
+
     def create_menu(self):
-        self.menu = Menu(self.create_level)
+        self.menu = Menu(self.create_level, self.create_secret_level)
         self.status = 'menu'
         self.level_music.stop()
+        self.secret_level_music.stop()
         self.menu_music.play(loops = -1)
 
     def run(self):
-
         if self.status == 'menu':
             self.menu.run()
             return False
         elif self.status == 'level':
             self.level.run()
             return True
+        
+
 
 def play_random(list, history):
     index = 0
@@ -239,7 +260,9 @@ if __name__ == '__main__':
     FLOOD_1_IMG = pygame.image.load('../graphics/flood/walk_1.png').convert_alpha()
     FLOOD_2_IMG = pygame.image.load('../graphics/flood/walk_2.png').convert_alpha()
     LEVEL_IMG = pygame.image.load('../graphics/background/bg_2.jpg').convert_alpha()
+    SECRET_LEVEL_IMG = pygame.image.load('../graphics/background/bg_3.jpg').convert_alpha()
     GROUND_IMG = pygame.image.load('../graphics/ground.png').convert_alpha()
+    SECRET_GROUND_IMG = pygame.image.load('../graphics/secret_ground.png').convert_alpha()
     MENU_IMG = pygame.image.load('../graphics/background/bg_1.jpg').convert()
     MAIN_FONT = pygame.font.Font('../font/Halo.ttf', 125)
     SECONDARY_FONT = pygame.font.Font('../font/Pixeltype.ttf', 35)
