@@ -18,6 +18,7 @@ class Player(pygame.sprite.Sprite):
         self.image = self.player_walk[self.player_index]
         self.rect = self.image.get_rect(midbottom = (160, GROUND))
         self.gravity = 0
+        self.jump_height = -20
 
         #speech
         self.speech_history = []
@@ -35,7 +36,7 @@ class Player(pygame.sprite.Sprite):
         global speech_list
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and self.rect.bottom >= GROUND:
-            self.gravity = -20 #jump
+            self.gravity = self.jump_height #jump
             self.speech_history = play_random(speech_list, self.speech_history)
 
 
@@ -99,6 +100,7 @@ class Obstacle(pygame.sprite.Sprite):
         self.flood_index = 0
         self.image = self.flood_frames[self.flood_index]
         self.rect = self.image.get_rect(midbottom = (randint(WIDTH,WIDTH+100), GROUND))
+        self.obstacle_speed = 9
 
     def animation_state(self):
         self.flood_index += 0.1
@@ -111,7 +113,7 @@ class Obstacle(pygame.sprite.Sprite):
 
     def update(self):
         self.animation_state()
-        self.rect.x -= 9
+        self.rect.x -= self.obstacle_speed
         self.destroy()
 
 class Level:
@@ -209,12 +211,23 @@ class Game:
     
     def create_secret_level(self):
         self.level = Level(self.create_menu, self.create_secret_level)
+
+        #level adjustment
         self.level.level_bg = SECRET_LEVEL_IMG
         self.level.ground = SECRET_GROUND_IMG
+
+        #player adjustment
+        self.level.player.sprite.player_walk = [SECRET_GRUNT_1_IMG, SECRET_GRUNT_2_IMG]
+        self.level.player.sprite.player_jump = SECRET_GRUNT_JUMP_IMG
+        self.level.player.sprite.jump_height = -22
+
+
         self.status = 'level'
         self.menu_music.stop()
         self.level_music.stop()
         self.secret_level_music.play(loops = -1)
+
+
 
     def create_menu(self):
         self.menu = Menu(self.create_level, self.create_secret_level)
@@ -275,6 +288,9 @@ if __name__ == '__main__':
     GRUNT_1_IMG = pygame.image.load('../graphics/grunt/walk_1.png').convert_alpha()
     GRUNT_2_IMG = pygame.image.load('../graphics/grunt/walk_2.png').convert_alpha()
     GRUNT_JUMP_IMG = pygame.image.load('../graphics/grunt/jump.png').convert_alpha()
+    SECRET_GRUNT_1_IMG = pygame.image.load('../graphics/grunt/secret_walk_1.png').convert_alpha()
+    SECRET_GRUNT_2_IMG = pygame.image.load('../graphics/grunt/secret_walk_2.png').convert_alpha()
+    SECRET_GRUNT_JUMP_IMG = pygame.image.load('../graphics/grunt/secret_jump.png').convert_alpha()
     GRUNT_ICON_IMG = pygame.image.load('../graphics/grunt/icon.png').convert_alpha()
     collision_sound_list = import_audio('../audio/sound_effects/collision')
     speech_list = import_audio('../audio/sound_effects/general')
