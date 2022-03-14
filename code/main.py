@@ -120,6 +120,8 @@ class Level:
         #player
         self.player = pygame.sprite.GroupSingle()
         self.player.add(Player())
+        self.lives_icon = GRUNT_ICON_IMG
+        self.lives = 3 
 
         #clear obstacles
         global obstacle_group
@@ -140,9 +142,11 @@ class Level:
 
     def run(self):
 
-        #if self.collision():
-        #    self.create_menu()
-
+        if self.collision():
+            self.lives -= 1
+            if self.lives <= 0:
+                self.create_menu()
+            
         global obstacle_group
         self.get_input()
 
@@ -150,6 +154,17 @@ class Level:
         self.display_surface.blit(self.level_bg, self.level_bg.get_rect(midbottom = (450,HEIGHT)))
         self.display_surface.blit(self.ground, self.ground.get_rect(center = (450, 225)))
         
+        if self.lives == 1:
+            self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (75, 100)))
+        elif self.lives == 2:
+            self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (75, 100)))
+            self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (160, 100)))
+        elif self.lives == 3:
+            self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (75, 100)))
+            self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (160, 100)))
+            self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (245, 100)))
+
+
         self.player.update()
         self.player.draw(self.display_surface)
         obstacle_group.update()
@@ -211,6 +226,7 @@ if __name__ == '__main__':
     GRUNT_1_IMG = pygame.image.load('../graphics/grunt/walk_1.png').convert_alpha()
     GRUNT_2_IMG = pygame.image.load('../graphics/grunt/walk_2.png').convert_alpha()
     GRUNT_JUMP_IMG = pygame.image.load('../graphics/grunt/jump.png').convert_alpha()
+    GRUNT_ICON_IMG = pygame.image.load('../graphics/grunt/icon.png').convert_alpha()
     speech_list = import_audio('../audio/sound_effects/general')
     
     #timers
