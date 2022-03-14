@@ -20,6 +20,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom = (160, GROUND))
         self.gravity = 0
         self.jump_height = -20
+        self.jumped_already = False
 
         #speech
         self.speech_history = []
@@ -38,7 +39,11 @@ class Player(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and self.rect.bottom >= GROUND:
             self.gravity = self.jump_height #jump
-            self.speech_history = play_random(speech_list, self.speech_history)
+            if self.jumped_already:
+                self.jumped_already = False
+            else:
+                self.speech_history = play_random(speech_list, self.speech_history)
+                self.jumped_already = True
 
 
     def apply_gravity(self):
@@ -186,6 +191,8 @@ class Level:
         self.display_surface.blit(self.ground, self.ground.get_rect(center = (450, 225)))
         self.score = self.display_score()
 
+        #Not showing lives icons for now
+        """
         if self.lives == 1:
             self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (75, 100)))
         elif self.lives == 2:
@@ -195,7 +202,7 @@ class Level:
             self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (75, 100)))
             self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (160, 100)))
             self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (245, 100)))
-
+        """
 
         self.player.update()
         self.player.draw(self.display_surface)
@@ -307,7 +314,7 @@ if __name__ == '__main__':
     
     #timers
     obstacle_timer = pygame.USEREVENT + 1
-    pygame.time.set_timer(obstacle_timer, 1400) #for spawning the flood
+    pygame.time.set_timer(obstacle_timer, 1200) #for spawning the flood
 
     #flood obstacles
     obstacle_group = pygame.sprite.Group()
