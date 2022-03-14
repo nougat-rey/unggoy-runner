@@ -19,6 +19,9 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom = (160, GROUND))
         self.gravity = 0
 
+        #speech
+        self.speech_history = []
+
     def animation_state(self):
 
         if self.rect.bottom < GROUND:
@@ -29,9 +32,12 @@ class Player(pygame.sprite.Sprite):
             self.image = self.player_walk[int(self.player_index)]
 
     def player_input(self):
+        global speech_list
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and self.rect.bottom >= GROUND:
             self.gravity = -20 #jump
+            self.speech_history = play_random(speech_list, self.speech_history)
+
 
     def apply_gravity(self):
         #applies when jumping, simulates falling 
@@ -276,16 +282,13 @@ if __name__ == '__main__':
     
     #timers
     obstacle_timer = pygame.USEREVENT + 1
-    pygame.time.set_timer(obstacle_timer, 1200) #for spawning the flood
-    speech_timer = pygame.USEREVENT + 2
-    pygame.time.set_timer(speech_timer, randint(4000, 6000))
+    pygame.time.set_timer(obstacle_timer, 1400) #for spawning the flood
 
     #flood obstacles
     obstacle_group = pygame.sprite.Group()
     
     game = Game()     
     game_active = False
-    speech_history = []
     
     #add if playing...
     while True:
@@ -296,9 +299,7 @@ if __name__ == '__main__':
             if game_active:
                 if event.type == obstacle_timer:
                     obstacle_group.add(Obstacle())
-                if event.type == speech_timer:
-                    speech_history = play_random(speech_list, speech_history)
-
+                    
         game_active = game.run()
         pygame.display.update()
         clock.tick(60)
