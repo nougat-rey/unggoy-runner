@@ -145,7 +145,7 @@ class Level:
         self.player = pygame.sprite.GroupSingle()
         self.player.add(Player())
         self.lives_icon = GRUNT_ICON_IMG
-        self.lives = 3 
+        self.lives = 3
 
         #clear obstacles
         global obstacle_group
@@ -164,7 +164,7 @@ class Level:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RETURN]:
             #go back to menu
-            self.create_menu()
+            self.create_menu(False)
         if keys[pygame.K_7]:
             self.create_secret_level()
 
@@ -181,7 +181,7 @@ class Level:
             self.hit_sound_history = play_random(self.hit_sound_list, self.hit_sound_history)
             self.lives -= 1
             if self.lives <= 0:
-                self.create_menu()
+                self.create_menu(True)
             
         global obstacle_group
         self.get_input()
@@ -247,11 +247,17 @@ class Game:
         self.secret_level_music.stop() #incase 7 is pressed during secret level to start a new secret level
         self.secret_level_music.play(loops = -1)
 
-    def create_menu(self):
+    def create_menu(self, died):
+
+        #list of voice dialogue to be played when going back to main menu
+        global game_over_list
+
         self.menu = Menu(self.create_level, self.create_secret_level)
         self.status = 'menu'
         self.level_music.stop()
         self.secret_level_music.stop()
+        if died:
+            play_random(game_over_list, [])
         self.menu_music.play(loops = -1)
 
     def run(self):
@@ -263,7 +269,7 @@ class Game:
             return True
         
 def play_random(list, history):
-    index = 0
+    index = randint(0, len(list)-1) 
     success = False
 
     while success == False:
@@ -310,7 +316,7 @@ if __name__ == '__main__':
     GRUNT_ICON_IMG = pygame.image.load('../graphics/grunt/icon.png').convert_alpha()
     collision_sound_list = import_audio('../audio/sound_effects/collision')
     speech_list = import_audio('../audio/sound_effects/general')
-
+    game_over_list = import_audio('../audio/game_over')
     
     #timers
     obstacle_timer = pygame.USEREVENT + 1
