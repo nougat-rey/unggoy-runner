@@ -3,6 +3,7 @@ from settings import *
 from sys import exit
 from random import randint
 from support import import_audio
+from time import time
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -126,6 +127,10 @@ class Level:
         self.level_bg = LEVEL_IMG
         self.ground = GROUND_IMG
         
+        #score
+        self.score = 0
+        self.start_time = time()
+
         #create menu from level
         self.create_menu = create_menu
         #create secret level from level
@@ -158,6 +163,13 @@ class Level:
         if keys[pygame.K_7]:
             self.create_secret_level()
 
+    def display_score(self):
+        current_time = int(time() - self.start_time)
+        score_surf = SECONDARY_FONT.render(f'Score: {current_time}', False, (150, 150, 150))
+        score_rect = score_surf.get_rect(center = (450,50))
+        screen.blit(score_surf, score_rect)
+        return current_time
+
     def run(self):
 
         if self.collision():
@@ -172,7 +184,8 @@ class Level:
         #display
         self.display_surface.blit(self.level_bg, self.level_bg.get_rect(midbottom = (450,HEIGHT)))
         self.display_surface.blit(self.ground, self.ground.get_rect(center = (450, 225)))
-        
+        self.score = self.display_score()
+
         if self.lives == 1:
             self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (75, 100)))
         elif self.lives == 2:
@@ -221,13 +234,11 @@ class Game:
         self.level.player.sprite.player_jump = SECRET_GRUNT_JUMP_IMG
         self.level.player.sprite.jump_height = -22
 
-
         self.status = 'level'
         self.menu_music.stop()
         self.level_music.stop()
+        self.secret_level_music.stop() #incase 7 is pressed during secret level to start a new secret level
         self.secret_level_music.play(loops = -1)
-
-
 
     def create_menu(self):
         self.menu = Menu(self.create_level, self.create_secret_level)
@@ -244,8 +255,6 @@ class Game:
             self.level.run()
             return True
         
-
-
 def play_random(list, history):
     index = 0
     success = False
