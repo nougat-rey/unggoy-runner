@@ -12,6 +12,7 @@ python main.py
 
 + Press Space to jump
 + Press Return to return to main menu
++ Press 7 to enter secret level
 
 ## Acknowledgements
 
