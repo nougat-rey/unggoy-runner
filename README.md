@@ -1,5 +1,6 @@
 # unggoy-runner
-Play as an unggoy (grunt) from the Halo universe as it tries to evade the flood infection form coming after it. Try to survive as long as possible.
+
+Game built using the pygame library. Play as an unggoy (grunt) from the Halo universe as it tries to evade the flood infection form coming after it. Try to survive as long as possible.
 
 ## Run Instructions
 
