@@ -1,5 +1,5 @@
 # unggoy-runner
-Play as an unggoy (grunt) from the Halo universe as it tries to evade the flood infection form coming after it! Try to survive as long as possible!
+Play as an unggoy (grunt) from the Halo universe as it tries to evade the flood infection form coming after it. Try to survive as long as possible.
 
 ## Run Instructions
 
@@ -13,6 +13,9 @@ python main.py
 + Press Space to jump
 + Press Return to return to main menu
 + Press 7 to enter secret level
+
+## Motivation
+I've been a fan of the Halo universe since I was a kid, and I always had a soft spot for the grunts. I especially loved their commentary and thought it'd be funny to build a game around these little fellas.
 
 ## Acknowledgements
 
