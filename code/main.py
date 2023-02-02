@@ -80,6 +80,22 @@ class Menu:
             'Unggoy Runner', True, '#253028')
         self.sec_msg_rect = self.sec_msg_surf.get_rect(center=(450, 190))
 
+        self.animate_states = ['#fbfffe', '#fcffff',
+                               '#eaeaea', '#e0e0e0',
+                               '#d6d6d6', '#cccccc',
+                               '#c2c2c2', '#b8b8b8',
+                               '#aeaeae', '#a4a4a4',
+                               '#aeaeae', '#b8b8b8',
+                               '#c2c2c2', '#cccccc',
+                               '#d6d6d6', '#e0e0e0',
+                               '#eaeaea', '#fcffff',
+                               '#fbfffe']
+        self.animate_counter = 0
+        self.action_font = SECONDARY_FONT
+        self.action_msg_surf = self.action_font.render(
+            'Press space to start', True, self.animate_states[self.animate_counter])
+        self.action_msg_rect = self.action_msg_surf.get_rect(center=(450, 300))
+
         # create level from menu
         self.create_level = create_level
         # create secret level from menu
@@ -93,14 +109,24 @@ class Menu:
         if keys[pygame.K_7]:
             self.create_secret_level()
 
+    def animate_action_msg(self):
+        self.animate_counter += 0.12
+        if self.animate_counter > len(self.animate_states)-1:
+            self.animate_counter = 0
+        self.action_msg_surf = self.action_font.render(
+            'Press space to start', True, self.animate_states[int(self.animate_counter)])
+
     def run(self):
         self.get_input()
+
+        self.animate_action_msg()
 
         # display
         self.display_surface.blit(
             self.menu_bg, self.menu_bg.get_rect(center=(422, 235)))
         self.display_surface.blit(self.main_msg_surf, self.main_msg_rect)
         self.display_surface.blit(self.sec_msg_surf, self.sec_msg_rect)
+        self.display_surface.blit(self.action_msg_surf, self.action_msg_rect)
 
 
 class Obstacle(pygame.sprite.Sprite):
@@ -204,19 +230,6 @@ class Level:
         self.display_surface.blit(
             self.ground, self.ground.get_rect(center=(450, 225)))
         self.score = self.display_score()
-
-        # Not showing lives icons for now
-        """
-        if self.lives == 1:
-            self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (75, 100)))
-        elif self.lives == 2:
-            self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (75, 100)))
-            self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (160, 100)))
-        elif self.lives == 3:
-            self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (75, 100)))
-            self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (160, 100)))
-            self.display_surface.blit(self.lives_icon, self.lives_icon.get_rect(midbottom = (245, 100)))
-        """
 
         self.player.update()
         self.player.draw(self.display_surface)
