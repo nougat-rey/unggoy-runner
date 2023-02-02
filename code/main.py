@@ -233,10 +233,10 @@ class Game:
 
         # audio
         self.menu_music = pygame.mixer.Sound(
-            '../audio/bg_music/Mombasa_Suite.mp3')
-        self.level_music = pygame.mixer.Sound('../audio/bg_music/Peril.mp3')
+            '../audio/bg_music/Mombasa_Suite.ogg')
+        self.level_music = pygame.mixer.Sound('../audio/bg_music/Peril.ogg')
         self.secret_level_music = pygame.mixer.Sound(
-            '../audio/bg_music/Under_Cover_of_Night.mp3')
+            '../audio/bg_music/Under_Cover_of_Night.ogg')
 
         # menu creation
         self.menu = Menu(self.create_level, self.create_secret_level)
