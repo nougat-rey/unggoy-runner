@@ -80,20 +80,11 @@ class Menu:
             'Unggoy Runner', True, '#253028')
         self.sec_msg_rect = self.sec_msg_surf.get_rect(center=(450, 190))
 
-        self.animate_states = ['#fbfffe', '#fcffff',
-                               '#eaeaea', '#e0e0e0',
-                               '#d6d6d6', '#cccccc',
-                               '#c2c2c2', '#b8b8b8',
-                               '#aeaeae', '#a4a4a4',
-                               '#aeaeae', '#b8b8b8',
-                               '#c2c2c2', '#cccccc',
-                               '#d6d6d6', '#e0e0e0',
-                               '#eaeaea', '#fcffff',
-                               '#fbfffe']
-        self.animate_counter = 0
+        self.alpha = 255
+        self.alpha_vel = 3
         self.action_font = SECONDARY_FONT
         self.action_msg_surf = self.action_font.render(
-            'Press space to start', True, self.animate_states[self.animate_counter])
+            'Press space to start', True, '#fbfffe')
         self.action_msg_rect = self.action_msg_surf.get_rect(center=(450, 300))
 
         # create level from menu
@@ -110,11 +101,11 @@ class Menu:
             self.create_secret_level()
 
     def animate_action_msg(self):
-        self.animate_counter += 0.12
-        if self.animate_counter > len(self.animate_states)-1:
-            self.animate_counter = 0
-        self.action_msg_surf = self.action_font.render(
-            'Press space to start', True, self.animate_states[int(self.animate_counter)])
+
+        if self.alpha >= 255 or self.alpha <= 100:
+            self.alpha_vel *= -1
+        self.alpha += self.alpha_vel
+        self.action_msg_surf.set_alpha(self.alpha)
 
     def run(self):
         self.get_input()
@@ -304,7 +295,7 @@ class Game:
     def death_screen(self):
         display_surface = pygame.display.get_surface()
         menu_bg = MENU_IMG
-        #display_surface.blit(menu_bg, menu_bg.get_rect(center=(422, 235)))
+        # display_surface.blit(menu_bg, menu_bg.get_rect(center=(422, 235)))
         msg_surf = SECONDARY_FONT.render(
             "And this is when I knew I was doomed", True, '#fbfffe')
         msg_rect = msg_surf.get_rect(center=(450, 190))
